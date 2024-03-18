@@ -1,28 +1,20 @@
 from fastapi.testclient import TestClient
-from sqlmodel import Field, Session, SQLModel, create_engine, select
-# https://sqlmodel.tiangolo.com/tutorial/fastapi/tests/#override-a-dependency
-from todo.main import app, get_session, Todo
+from sqlmodel import Session, SQLModel, create_engine
+from todo.main import app, get_session
 
-from todo.settings import settings
-
-# https://fastapi.tiangolo.com/tutorial/testing/
-# https://realpython.com/python-assert-statement/
-# https://understandingdata.com/posts/list-of-python-assert-statements-for-unit-tests/
-
-# postgresql://ziaukhan:oSUqbdELz91i@ep-polished-waterfall-a50jz332.us-east-2.aws.neon.tech/neondb?sslmode=require
+from todo import settings
 
 
 def test_read_main():
     client = TestClient(app=app)
     response = client.get("/")
     assert response.status_code == 200
-    assert response.json() == {"Hello": "World"}
+    assert response.json() == ['Hello World']
 
 
 def test_write_main():
 
-    connection_string = str(settings.TEST_DATABASE_URL).replace(
-        "postgresql", "postgresql+psycopg")
+    connection_string = str(settings.DATABASE_URL)
 
     engine = create_engine(
         connection_string, connect_args={"sslmode": "require"}, pool_recycle=300)
@@ -38,11 +30,9 @@ def test_write_main():
 
         client = TestClient(app=app)
 
-        todo_content = "buy bread"
+        todo_content = "test todo"
 
-        response = client.post("/todos/",
-                               json={"content": todo_content}
-                               )
+        response = client.post("/todos/", json={"content": todo_content})
 
         data = response.json()
 
@@ -52,8 +42,7 @@ def test_write_main():
 
 def test_read_list_main():
 
-    connection_string = str(settings.TEST_DATABASE_URL).replace(
-        "postgresql", "postgresql+psycopg")
+    connection_string = str(settings.DATABASE_URL)
 
     engine = create_engine(
         connection_string, connect_args={"sslmode": "require"}, pool_recycle=300)

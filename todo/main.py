@@ -8,11 +8,7 @@ from fastapi import FastAPI, Depends, HTTPException
 
 class Todo(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
-    name: str = Field(index=True)
-    description: Optional[str] = Field(default=None, index=True)
-    age: Optional[int] = Field(default=None, index=True)
     content: str = Field(index=True)
-    address: str = Field(default=None, index=True)
 
 
 # only needed for psycopg 3 - replace postgresql
@@ -41,7 +37,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(lifespan=lifespan, title="Todo API with DB",
+app = FastAPI(lifespan=lifespan, title="Todo API with DB by Ahmad Bilal",
               version="0.0.1",
               servers=[
                   {
@@ -86,11 +82,7 @@ def update_todo(todo_id: int, todo: Todo, session: Annotated[Session, Depends(ge
     todo_query = session.exec(select(Todo).where(Todo.id == todo_id)).first()
     if not todo_query:
         raise HTTPException(status_code=404, detail="Todo not found")
-    todo_query.name = todo.name
-    todo_query.description = todo.description
-    todo_query.age = todo.age
     todo_query.content = todo.content
-    todo_query.address = todo.address
     session.commit()
     session.refresh(todo_query)
     return todo_query

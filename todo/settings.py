@@ -10,4 +10,4 @@ except FileNotFoundError:
 DATABASE_URL = config("DATABASE_URL", cast=Secret)
 
 TEST_DATABASE_URL = config(
-    "DATABASE_URL", cast=Secret)
+    "TEST_DATABASE_URL", cast=Secret, default=None)
